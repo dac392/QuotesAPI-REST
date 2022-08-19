@@ -24,7 +24,7 @@ app.get('/quotes/:id', async (req, res)=>{
         if(quote){
             res.status(201).json(quote)
         } else{
-            res.status(400).json({message: "Quote was not found"})
+            res.status(404).json({message: "Quote was not found"})
         }
         
     }catch(err){
@@ -44,7 +44,7 @@ app.post('/quotes', async (req, res)=>{
             });
             res.status(201).json(quote)
         }else{
-            res.status(404).json({message: "Quote and Author are required"})
+            res.status(400).json({message: "Quote and Author are required"})
         }
 
     }catch(err){
@@ -54,6 +54,23 @@ app.post('/quotes', async (req, res)=>{
 })
 
 // send a PUT request to /quotes/:id to UPDATE (edit) a quote
+app.put('/quotes/:id', async (req, res)=>{
+    try{
+        const quote = await records.getQuote(req.params.id);
+        if(quote){
+            quote.quote = req.body.quote;
+            quote.author = req.body.author;
+            await records.updateQuote(quote)
+            res.status(204).end(); // success but no content as a response
+            // end() just tells the server that we are done
+        }else{
+            res.status(404).json({message: "Quote not found"})
+        }
+    }catch(err){
+        res.status(500).json({message: err.message})
+    }
+})
+
 // send a DELETE request to /quotes:id DELETE a quote
 // send a GET request to /quotes/quote/random to READ a random quote
 
